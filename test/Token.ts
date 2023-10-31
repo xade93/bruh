@@ -30,7 +30,7 @@ describe("Token", () => {
       const { DUT, owner } = await loadFixture(prepareDUTToken);
       expect(await DUT.read.name()).to.equal("DutchToken");
       expect(await DUT.read.symbol()).to.equal("DUT");
-      expect(await DUT.read.remainBalance()).to.equal(256n);
+      expect(await DUT.read.remainToken()).to.equal(256n);
     });
     it("Owner should be the creater", async function () {
       const { DUT, owner } = await loadFixture(prepareDUTToken);
@@ -41,7 +41,7 @@ describe("Token", () => {
       const unlockTime = BigInt((await time.latest()) + 20 * 60);
       await time.increaseTo(unlockTime)
       expect(await DUT.read.burnAfterTime());
-      expect(await DUT.read.remainBalance()).to.equal(0n);
+      await expect(DUT.read.remainToken()).to.be.rejectedWith("Token is destroyed")
       await expect(
         DUT.write.transferTo([otherAccount.account.address, 10])
       ).to.be.rejectedWith("Token is destroyed");
@@ -62,7 +62,7 @@ describe("Token", () => {
       await expect(
         DUT.write.transferTo([otherAccount.account.address, 30n])
       ).to.be.fulfilled;
-      await expect(await DUT.read.remainBalance()).to.equal(226n);
+      await expect(await DUT.read.remainToken()).to.equal(226n);
     });
     it("Owner cannot transfer more money than balance", async function () {
       const { DUT, owner, otherAccount } = await loadFixture(prepareDUTToken);

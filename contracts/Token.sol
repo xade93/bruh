@@ -22,17 +22,36 @@ contract DUT is ERC20 {
         _;
     }
 
-    function remainBalance() public view returns (uint256) {
-        if (block.timestamp >= destructionTime) {
-            return 0;
-        } else {
-            return balanceOf(owner);
-        }
+    function remainToken() public view returns (uint256) {
+        require(block.timestamp < destructionTime, "Token is destroyed");
+        return super.balanceOf(owner);
     }
 
     function transferTo(address recipient, uint256 amount) external onlyOwner {
         require(block.timestamp < destructionTime, "Token is destroyed");
-        _transfer(owner, recipient, amount);
+        super._transfer(owner, recipient, amount);
+    }
+
+    function transfer(
+        address to,
+        uint256 value
+    ) public override returns (bool) {
+        address sender = super._msgSender();
+        require(sender != owner, "Sender cannot be owner");
+        super._transfer(owner, to, value);
+        return true;
+    }
+
+    function transferFrom(
+        address from,
+        address to,
+        uint256 value
+    ) public override returns (bool) {
+        require(from != owner, "Transfer from address cannot be owner");
+        address spender = super._msgSender();
+        super._spendAllowance(from, spender, value);
+        super._transfer(from, to, value);
+        return true;
     }
 
     function burnAfterTime() external {
@@ -40,6 +59,6 @@ contract DUT is ERC20 {
             block.timestamp >= destructionTime,
             "Cannot burn tokens before 20 minutes"
         );
-        _burn(owner, balanceOf(owner));
+        super._burn(owner, balanceOf(owner));
     }
 }
