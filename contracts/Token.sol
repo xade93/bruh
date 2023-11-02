@@ -54,7 +54,7 @@ contract DUT is ERC20 {
         return true;
     }
 
-    function burnAfterTime() external {
+    function burnAfterTime() external onlyOwner {
         require(
             block.timestamp >= destructionTime,
             "Cannot burn tokens before 20 minutes"
