@@ -110,8 +110,8 @@ contract DutchAuction {
         }
         emit AuctionEnded(bidders, bids);
         // Transfer the highest bid to the auctioneer
-        if (block.timestamp >= startTime + 20 minutes) {
-            token.burnAfterTime();
-        }
+        // if (block.timestamp >= startTime + 20 minutes) {
+        //     token.burnAfterTime();
+        // }
     }
 }

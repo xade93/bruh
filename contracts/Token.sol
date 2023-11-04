@@ -5,40 +5,59 @@ pragma solidity ^0.8.20;
 import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 contract DUT is ERC20 {
-    address public owner;
-    uint256 public destructionTime;
+    address public auctionHouse;
+
+    mapping(address => uint256) private _lockedBalance;
 
     constructor(uint256 initialSupply) ERC20("DutchToken", "DUT") {
         _mint(msg.sender, initialSupply);
-        owner = msg.sender;
-        destructionTime = block.timestamp + 20 minutes;
+        auctionHouse = msg.sender;
     }
 
     modifier onlyOwner() {
         require(
-            msg.sender == owner,
-            "Only the owner can execute this function"
+            msg.sender == auctionHouse,
+            "Only the auction house can execute this function"
         );
         _;
     }
 
-    function remainToken() public view returns (uint256) {
-        require(block.timestamp < destructionTime, "Token is destroyed");
-        return super.balanceOf(owner);
+    function lockedBalanceOf(address account) public view returns (uint256) {
+        return _lockedBalance[account];
     }
 
-    function transferTo(address recipient, uint256 amount) external onlyOwner {
-        require(block.timestamp < destructionTime, "Token is destroyed");
-        super._transfer(owner, recipient, amount);
+    function _addLockedBalance(address account, uint256 value) internal {
+        _lockedBalance[account] += value;
+    }
+
+    function _delLockedBalance(address account, uint256 value) internal {
+        _lockedBalance[account] -= value;
     }
 
     function transfer(
         address to,
         uint256 value
     ) public override returns (bool) {
-        address sender = super._msgSender();
-        require(sender != owner, "Sender cannot be owner");
-        super._transfer(owner, to, value);
+        address owner = _msgSender();
+        require(
+            balanceOf(owner) - lockedBalanceOf(owner) >= value,
+            "unlocked balance is not enough to transfer"
+        );
+        _transfer(owner, to, value);
+        return true;
+    }
+
+    function approve(
+        address spender,
+        uint256 value
+    ) public override returns (bool) {
+        address owner = _msgSender();
+        require(
+            balanceOf(owner) - lockedBalanceOf(owner) >= value,
+            "unlocked balance is not enough to create approvement"
+        );
+        _addLockedBalance(owner, value);
+        _approve(owner, spender, value);
         return true;
     }
 
@@ -47,18 +66,37 @@ contract DUT is ERC20 {
         address to,
         uint256 value
     ) public override returns (bool) {
-        require(from != owner, "Transfer from address cannot be owner");
-        address spender = super._msgSender();
-        super._spendAllowance(from, spender, value);
-        super._transfer(from, to, value);
+        require(
+            lockedBalanceOf(from) >= value,
+            "locked balance is not enough to transfer"
+        );
+        address spender = _msgSender();
+        require(
+            allowance(from, spender) >= value,
+            "allowance is not enough to transfer"
+        );
+        _spendAllowance(from, spender, value);
+        _delLockedBalance(from, value);
+        _transfer(from, to, value);
         return true;
     }
 
-    function burnAfterTime() external onlyOwner {
+    function burnAllowance(
+        address from,
+        uint256 value
+    ) public onlyOwner returns (bool) {
         require(
-            block.timestamp >= destructionTime,
-            "Cannot burn tokens before 20 minutes"
+            lockedBalanceOf(from) >= value,
+            "locked balance is not enough to transfer"
         );
-        super._burn(owner, balanceOf(owner));
+        address spender = _msgSender();
+        require(
+            allowance(from, spender) >= value,
+            "allowance is not enough to transfer"
+        );
+        _spendAllowance(from, spender, value);
+        _delLockedBalance(from, value);
+        _burn(from, value);
+        return true;
     }
 }
