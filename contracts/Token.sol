@@ -83,13 +83,17 @@ contract DUT is ERC20 {
 
     function burnAllowance(
         address from,
+        address spender,
         uint256 value
-    ) public onlyOwner returns (bool) {
+    ) public returns (bool) {
+        require(
+            msg.sender == auctionHouse || msg.sender == spender,
+            "Only the auction house  or spender can execute this function"
+        );
         require(
             lockedBalanceOf(from) >= value,
             "locked balance is not enough to transfer"
         );
-        address spender = _msgSender();
         require(
             allowance(from, spender) >= value,
             "allowance is not enough to transfer"
