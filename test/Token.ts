@@ -9,7 +9,7 @@ describe("Token", () => {
   async function prepareDUTToken() {
     const [owner, accountA, accountB, accountC] = await hre.viem.getWalletClients();
 
-    const DUT = await hre.viem.deployContract("DUT", [256]);
+    const DUT = await hre.viem.deployContract("DUT", [256n]);
 
     const publicClient = await hre.viem.getPublicClient();
 

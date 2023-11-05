@@ -32,8 +32,8 @@ describe("DutchAuction", function () {
   describe("Deployment", function () {
     it("Should init prepareDutchAuction", async function () {
       const { DUT, auction, owner, accountA, accountB, accountC, publicClient } = await loadFixture(prepareDutchAuction);
-      expect(DUT === DUT);
-      expect(auction === auction);
+      expect(DUT).to.be.not.null;
+      expect(auction).to.be.not.null;
     });
     it("Can create a DutchAuction", async function () {
       const { DUT, auction, owner, accountA, accountB, accountC, publicClient } = await loadFixture(prepareDutchAuction);
