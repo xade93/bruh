@@ -178,6 +178,7 @@ contract DutchAuction {
         uint256 bidsNumber = bidders[_auctionID].length;
         uint256 price = _finalPrice(_auctionID);
         uint256 totalTransfer = 0;
+        uint256 sellerBalance = 0;
         allowanceRequired[auctioneer[_auctionID]] -= initialSupply[_auctionID];
         for (uint i = 0; i < bidsNumber; i++) {
             amount[_auctionID].push(bids[_auctionID][i] / price);
@@ -188,10 +189,12 @@ contract DutchAuction {
                 amount[_auctionID][i]
             );
             totalTransfer += amount[_auctionID][i];
+            sellerBalance += amount[_auctionID][i] * price;
             if (bids[_auctionID][i] > 0) {
                 payable(bidders[_auctionID][i]).transfer(bids[_auctionID][i]);
             }
         }
+        payable(auctioneer[_auctionID]).transfer(sellerBalance);
         emit AuctionResult(_auctionID, bidders[_auctionID], bids[_auctionID]);
         shouldBurnValue[auctioneer[_auctionID]] +=
             initialSupply[_auctionID] -
