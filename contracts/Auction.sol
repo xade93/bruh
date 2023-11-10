@@ -122,9 +122,11 @@ contract DutchAuction {
     ) public payable auctionNotEnded(_auctionID) returns (bool) {
         uint256 price = currentPrice(_auctionID);
         require(msg.value >= price);
+        uint256 refund = 0;
         if (totalCommitment[_auctionID] >= price * initialSupply[_auctionID]) {
-            payable(msg.sender).transfer(price);
             _endAuction(_auctionID);
+            refund = msg.value;
+            payable(msg.sender).transfer(refund);
             return false;
         }
         uint256 remainMaximumValue = price *
@@ -132,7 +134,7 @@ contract DutchAuction {
             totalCommitment[_auctionID];
         uint256 commitment = msg.value;
         if (commitment > remainMaximumValue) {
-            payable(msg.sender).transfer(commitment - remainMaximumValue);
+            refund = commitment - remainMaximumValue;
             commitment = remainMaximumValue;
         }
         totalCommitment[_auctionID] += commitment;
@@ -141,6 +143,9 @@ contract DutchAuction {
         emit NewBid(_auctionID, msg.sender, commitment);
         if (totalCommitment[_auctionID] >= price * initialSupply[_auctionID]) {
             _endAuction(_auctionID);
+        }
+        if (refund != 0) {
+            payable(msg.sender).transfer(refund);
         }
         return true;
     }
