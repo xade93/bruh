@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import { CSSProperties } from 'react';
+import { Numbers } from 'web3';
+import { ethers } from 'ethers';
+
 const formStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: '1fr 3fr', 
@@ -20,11 +23,14 @@ const formStyle: CSSProperties = {
     border: '1px solid #ccc'
   };
   
-type TokenData = {
-  name: string;
-  currentPrice: number;
-  remainingTime: number;
-};
+  type TokenData = {
+    name: string;
+    currentPrice: number;
+    reservePrice: number;
+    priceDropInterval: number;
+    initialSupply: Numbers;
+    remainingTime: number;
+  };
 
 type AuctionFormProps = {
   addNewAuction: (newToken: TokenData) => void;
@@ -32,16 +38,19 @@ type AuctionFormProps = {
 
 export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
   const [name, setName] = useState('');
-  const [tokensSupplied, setTokensSupplied] = useState(0);
+  const [initialSupply, setInitialSupply] = useState(0);
   const [startPrice, setStartPrice] = useState(0);
   const [reservePrice, setReservePrice] = useState(0);
-  const [priceDropInterval, setPriceDropInterval] = useState('');
+  const [priceDropInterval, setPriceDropInterval] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addNewAuction({
       name,
       currentPrice: startPrice,
+      reservePrice, 
+      priceDropInterval, 
+      initialSupply, 
       remainingTime: 60, // You can set a default remaining time or modify the form to accept this value
     });
   };
@@ -64,8 +73,8 @@ export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
         <input
           style={inputStyle} 
           type="number"
-          value={tokensSupplied}
-          onChange={(e) => setTokensSupplied(Number(e.target.value))}
+          value={initialSupply}
+          onChange={(e) => setInitialSupply(Number(e.target.value))}
           placeholder="Tokens Supplied" 
         />
   
@@ -91,7 +100,7 @@ export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
         <select 
           style={inputStyle}
           value={priceDropInterval}
-          onChange={(e) => setPriceDropInterval(e.target.value)}
+          onChange={(e) => setPriceDropInterval(Number(e.target.value))}
         >
           <option value="0.1">0.1</option>
           <option value="0.5">0.5</option>

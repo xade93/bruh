@@ -2,15 +2,25 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import { AuctionForm } from './AuctionForm'; 
 import { BuyDialog } from './BuyDialog';
+import { ethers } from 'ethers';
+import { Numbers } from 'web3';
+
+// TODO: update after deployment
+const contractABI = require("../artifacts/contracts/Auction.sol/DutchAuction.json").abi; 
+const contractAddress = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512";
+
 type TokenData = {
   name: string;
   currentPrice: number;
+  reservePrice: number;
+  priceDropInterval: number;
+  initialSupply: Numbers;
   remainingTime: number;
 };
 
 const initialTokens: TokenData[] = [
-  { name: 'MyToken', currentPrice: 1.82, remainingTime: 30 },
-  { name: 'DogeToken', currentPrice: 302.12, remainingTime: 30 },
+  // { name: 'MyToken', currentPrice: 1.82, remainingTime: 30 },
+  // { name: 'DogeToken', currentPrice: 302.12, remainingTime: 30 },
 ];
 
 const App: React.FC = () => {
@@ -32,10 +42,42 @@ const App: React.FC = () => {
   }, []);
 
 
+  const provider = new ethers.providers.Web3Provider(window.ethereum);
+  const signer = provider.getSigner();
+  const auctionContract = new ethers.Contract(contractAddress, contractABI, signer);
 
-  const addNewAuction = (newToken: TokenData) => {
-    // TODO interact with ethereum
-    setShowForm(false); // Close the form after adding the new auction
+  const addNewAuction = async (newToken: TokenData) => {
+    try {
+      const name = ethers.utils.parseEther(newToken.name);
+      const startPrice = ethers.utils.parseEther(newToken.currentPrice.toString());
+      const reservePrice = ethers.utils.parseEther(newToken.reservePrice.toString());
+      const priceDropInterval = ethers.utils.parseEther(newToken.priceDropInterval.toString());
+      const initialSupply = ethers.BigNumber.from(newToken.initialSupply);
+      const transaction = await auctionContract.createAuction(
+        startPrice,
+        reservePrice,
+        priceDropInterval,
+        initialSupply
+      );
+      await transaction.wait();
+      setShowForm(false); 
+    } catch (error) {
+      console.error("Error adding new auction:", error);
+    }
+  };
+
+  const handleBuy = async (auctionId: number) => {
+    try {
+      const currentPrice = await auctionContract.currentPrice(auctionId);
+      const transaction = await auctionContract.bid(auctionId, {
+        value: currentPrice // Send the current price as the bid amount
+      });
+      await transaction.wait(); 
+      setBuyDiag(false);
+
+    } catch (error) {
+      console.error("Error placing a bid:", error);
+    }
   };
 
   return (
@@ -58,8 +100,8 @@ const App: React.FC = () => {
       {buyDiag && 
         <BuyDialog // FIXME
           token="1"
-          onBuy={(am)=>{}}
-          onCancel={()=>{}}
+          onBuy={handleBuy}
+          onCancel={() => setBuyDiag(false)}
         />}
     </div>
   );
