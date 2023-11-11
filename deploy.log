@@ -1,0 +1,372 @@
+{
+  read: {},
+  simulate: {},
+  createEventFilter: {},
+  getEvents: {},
+  watchEvent: {},
+  write: {},
+  estimateGas: {},
+  address: '0x5fbdb2315678afecb367f032d93f642f64180aa3',
+  abi: [
+    {
+      inputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'constructor'
+    },
+    {
+      inputs: [Array],
+      name: 'ERC20InsufficientAllowance',
+      type: 'error'
+    },
+    {
+      inputs: [Array],
+      name: 'ERC20InsufficientBalance',
+      type: 'error'
+    },
+    { inputs: [Array], name: 'ERC20InvalidApprover', type: 'error' },
+    { inputs: [Array], name: 'ERC20InvalidReceiver', type: 'error' },
+    { inputs: [Array], name: 'ERC20InvalidSender', type: 'error' },
+    { inputs: [Array], name: 'ERC20InvalidSpender', type: 'error' },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'Approval',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'Transfer',
+      type: 'event'
+    },
+    {
+      inputs: [Array],
+      name: 'allowance',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'approve',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'auctionHouse',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'balanceOf',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'burnAllowance',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'decimals',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'lockedBalanceOf',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'name',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'symbol',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'totalSupply',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'transfer',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'transferFrom',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    }
+  ]
+}
+{
+  read: {},
+  simulate: {},
+  createEventFilter: {},
+  getEvents: {},
+  watchEvent: {},
+  write: {},
+  estimateGas: {},
+  address: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+  abi: [
+    {
+      inputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'constructor'
+    },
+    { inputs: [], name: 'ReentrancyGuardReentrantCall', type: 'error' },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'AuctionEnded',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'AuctionResult',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'AuctionStarted',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'AuctionTokenBurn',
+      type: 'event'
+    },
+    {
+      anonymous: false,
+      inputs: [Array],
+      name: 'NewBid',
+      type: 'event'
+    },
+    {
+      inputs: [Array],
+      name: 'allowanceRequired',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'amount',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'auctioneer',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'bid',
+      outputs: [Array],
+      stateMutability: 'payable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'bidders',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'bids',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'burnToken',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'cancelAuction',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'commitmentEnough',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'completeAuction',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'createAuction',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'createAuction',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'currentPrice',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'endAuction',
+      outputs: [Array],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'finalPrice',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'getState',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'initialSupply',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'lastingTime',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'priceDropInterval',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'priceDropValue',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'reservePrice',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'shouldBurnValue',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'startAuction',
+      outputs: [],
+      stateMutability: 'nonpayable',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'startPrice',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'startTime',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'state',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [],
+      name: 'token',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    },
+    {
+      inputs: [Array],
+      name: 'totalCommitment',
+      outputs: [Array],
+      stateMutability: 'view',
+      type: 'function'
+    }
+  ]
+}
+
