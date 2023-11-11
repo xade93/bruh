@@ -223,7 +223,13 @@ contract DutchAuction is ReentrancyGuard {
      * Requirements:
      * - The function call must send enough ETH to cover the current price of the token.
      * - The auction must be in a running state and not yet ended.
-     * - The function uses nonReentrant modifier to prevent reentrancy attack.
+     * - The function does not uses nonReentrant modifier. 
+     * - This function does not use the nonReentrant modifier to prevent reentrancy attacks.
+     *   Instead, it follows the Checks-Effects-Interactions pattern. This approach is chosen
+     *   to enable buyers to automatically start a new bid after receiving a refund. Using
+     *   the nonReentrant modifier would cause the function to revert if the buyer attempts
+     *   to call it again within the same transaction, which is not desirable in this context.
+
      *
      * Notes:
      * - If the total commitment for the auction is already sufficient, the auction ends,
@@ -235,7 +241,7 @@ contract DutchAuction is ReentrancyGuard {
      */
     function bid(
         uint256 _auctionID
-    ) public payable auctionNotEnded(_auctionID) nonReentrant returns (bool) {
+    ) public payable auctionNotEnded(_auctionID) returns (bool) {
         uint256 price = currentPrice(_auctionID);
         require(msg.value >= price, "Bid amount is less than current price");
         uint256 refund = 0;
