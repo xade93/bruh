@@ -112,7 +112,7 @@ contract DutchAuction is ReentrancyGuard {
      * @param _reservePrice The minimum acceptable price for the auction.
      * @param _priceDropValue The value each interval drop
      * @param _initialSupply The amount of tokens available for auction.
-     * @param _priceDropInterval The time interval for price drop
+     * @param _priceDropInterval The time interval for price drop (in seconds)
      * @return auctionID The ID of the created auction.
      */
     function createAuction(
