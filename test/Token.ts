@@ -67,7 +67,7 @@ describe("Token", () => {
       ).to.be.fulfilled;
       await expect(
         userA.write.transferFrom([accountC.account.address, accountB.account.address, 10n])
-      ).to.be.rejectedWith("locked balance is not enough to transfer");
+      ).to.be.rejectedWith("Locked balance is not enough to transfer");
       await expect(
         userB.write.approve([accountA.account.address, 10n])
       ).to.be.fulfilled;
