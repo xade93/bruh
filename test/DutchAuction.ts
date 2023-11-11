@@ -35,7 +35,7 @@ describe("DutchAuction", function () {
       expect(DUT).to.be.not.null;
       expect(auction).to.be.not.null;
     });
-    it("Can create a DutchAuction", async function () {
+    it("Can run a DutchAuction", async function () {
       const { DUT, auction, owner, accountA, accountB, accountC, publicClient } = await loadFixture(prepareDutchAuction);
 
       expect(await DUT.read.auctionHouse()).to.equal(getAddress(owner.account.address));
@@ -78,9 +78,9 @@ describe("DutchAuction", function () {
       await expect(
         userA.write.startAuction([0n])
       ).to.be.fulfilled;
-      const waitingTime = BigInt((await time.latest()) + 256); // waiting 256 seconds
+      const waitingTime = BigInt((await time.latest()) + 60); // waiting 60 seconds
       await time.increaseTo(waitingTime)
-      expect(await auction.read.currentPrice([0n])).to.equal(990n);
+      expect(await auction.read.currentPrice([0n])).to.equal(975n);
       await expect(
         userA.write.endAuction([0n])
       ).to.be.rejected;
@@ -99,10 +99,50 @@ describe("DutchAuction", function () {
         ownerAuction.write.burnToken([accountA.account.address])
       ).to.be.fulfilled;
     });
-    // it("Should correctly decrease price when no transaction is made", async function () {
-    //   const { lock } = await loadFixture(prepareDutchAuction);
-    //   await lock.write.startAuction();
-    // });
+    it("Should able to pay", async function () {
+      const { DUT, auction, owner, accountA, accountB, accountC, publicClient } = await loadFixture(prepareDutchAuction);
+
+      expect(await DUT.read.auctionHouse()).to.equal(getAddress(owner.account.address));
+      const ownerAuction = await (hre.viem.getContractAt(
+        "DutchAuction",
+        auction.address,
+        { walletClient: owner }
+      ));
+      const userA = await (hre.viem.getContractAt(
+        "DutchAuction",
+        auction.address,
+        { walletClient: accountA }
+      ));
+      const userADUT = await (hre.viem.getContractAt(
+        "DUT",
+        DUT.address,
+        { walletClient: accountA }
+      ));
+      const userB = await (hre.viem.getContractAt(
+        "DutchAuction",
+        auction.address,
+        { walletClient: accountB }
+      ));
+      await expect(
+        DUT.write.transfer([accountA.account.address, 1000n])
+      ).to.be.fulfilled;
+      await expect(userADUT.write.approve([auction.address, 1000n])).to.be.fulfilled;
+      await expect(
+        userA.write.createAuction([1000n, 500n, 25n, 100n])
+      ).to.be.fulfilled;
+      await expect(
+        userA.write.startAuction([0n])
+      ).to.be.fulfilled;
+      await expect(
+        userB.write.bid([0n], { value: 100000n })
+      ).to.fulfilled;
+      expect(await auction.read.totalCommitment([0n])).to.equal(100000n);
+      expect(await auction.read.finalPrice([0n])).to.equal(1000n);
+      await expect(
+        userB.write.completeAuction([0n])
+      ).to.be.fulfilled;
+      expect(await DUT.read.balanceOf([accountB.account.address])).to.equal(100n);
+    });
   });
 
 

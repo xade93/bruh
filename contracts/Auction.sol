@@ -3,7 +3,9 @@ pragma solidity ^0.8.20;
 
 import {DUT} from "./Token.sol";
 
-contract DutchAuction {
+import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+
+contract DutchAuction is ReentrancyGuard {
     mapping(uint256 => address) public auctioneer;
     mapping(uint256 => uint256) public reservePrice;
     mapping(uint256 => uint256) public startPrice;
@@ -75,6 +77,7 @@ contract DutchAuction {
         initialSupply[auctionID] = _initialSupply;
         reservePrice[auctionID] = _reservePrice;
         startPrice[auctionID] = _startPrice;
+        totalCommitment[auctionID] = 0;
         priceDropInterval[auctionID] = _priceDropInterval;
         return auctionID;
     }
@@ -98,7 +101,9 @@ contract DutchAuction {
         uint256 _auctionID
     ) public view auctionNotEnded(_auctionID) returns (uint256) {
         uint256 elapsedTimes = block.timestamp - startTime[_auctionID];
-        uint256 priceDrop = elapsedTimes / priceDropInterval[_auctionID];
+        uint256 elapsedTimes_in_minutes = elapsedTimes / 60;
+        uint256 priceDrop = elapsedTimes_in_minutes *
+            priceDropInterval[_auctionID];
         return
             (startPrice[_auctionID] > reservePrice[_auctionID] + priceDrop)
                 ? startPrice[_auctionID] - priceDrop
@@ -119,20 +124,20 @@ contract DutchAuction {
 
     function bid(
         uint256 _auctionID
-    ) public payable auctionNotEnded(_auctionID) returns (bool) {
+    ) public payable auctionNotEnded(_auctionID) nonReentrant returns (bool) {
         uint256 price = currentPrice(_auctionID);
         require(msg.value >= price);
         uint256 refund = 0;
+        uint256 commitment = msg.value;
         if (totalCommitment[_auctionID] >= price * initialSupply[_auctionID]) {
             _endAuction(_auctionID);
-            refund = msg.value;
+            refund = commitment;
             payable(msg.sender).transfer(refund);
             return false;
         }
         uint256 remainMaximumValue = price *
             initialSupply[_auctionID] -
             totalCommitment[_auctionID];
-        uint256 commitment = msg.value;
         if (commitment > remainMaximumValue) {
             refund = commitment - remainMaximumValue;
             commitment = remainMaximumValue;
@@ -171,14 +176,21 @@ contract DutchAuction {
         if (totalCommitment[_auctionID] == 0) {
             return 0;
         }
-        uint256 price = initialSupply[_auctionID] / totalCommitment[_auctionID];
+        uint256 price = totalCommitment[_auctionID] / initialSupply[_auctionID];
         if (price < reservePrice[_auctionID]) {
             price = reservePrice[_auctionID];
         }
         return price;
     }
 
-    function completeAuction(uint256 _auctionID) public {
+    function finalPrice(uint256 _auctionID) external view returns (uint256) {
+        require(state[_auctionID] == AuctionState.Ended);
+        return _finalPrice(_auctionID);
+    }
+
+    function completeAuction(
+        uint256 _auctionID
+    ) public nonReentrant  {
         require(state[_auctionID] == AuctionState.Ended);
         uint256 bidsNumber = bidders[_auctionID].length;
         uint256 price = _finalPrice(_auctionID);
