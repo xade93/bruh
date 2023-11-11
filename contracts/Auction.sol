@@ -17,6 +17,7 @@ contract DutchAuction is ReentrancyGuard {
     mapping(uint256 => uint256) public reservePrice; // Minimum price of the auction
     mapping(uint256 => uint256) public startPrice; // Starting price of the auction
     mapping(uint256 => uint256) public startTime; // Timestamp when the auction starts
+    mapping(uint256 => uint256) public priceDropValue; // Price drop value for each interval
     mapping(uint256 => uint256) public priceDropInterval; // Time interval for price drop
     mapping(uint256 => address[]) public bidders; // List of bidders for each auction
     mapping(uint256 => uint256[]) public bids; // List of bids for each auction
@@ -74,19 +75,52 @@ contract DutchAuction is ReentrancyGuard {
     }
 
     /**
-     * @dev Creates a new auction with specified parameters.
+     * @dev Override the createAuction function. Take 60 seconds as default price drop interval.
      * The function sets various auction parameters and registers the auction.
      * @param _startPrice The initial price of the auction.
      * @param _reservePrice The minimum acceptable price for the auction.
-     * @param _priceDropInterval The interval at which the price drops.
+     * @param _priceDropValue The value each interval drop
      * @param _initialSupply The amount of tokens available for auction.
      * @return auctionID The ID of the created auction.
      */
     function createAuction(
         uint256 _startPrice,
         uint256 _reservePrice,
-        uint256 _priceDropInterval,
+        uint256 _priceDropValue,
         uint256 _initialSupply
+    ) public returns (uint256) {
+        require(
+            allowanceRequired[msg.sender] + _initialSupply <=
+                token.allowance(msg.sender, address(this)),
+            "allowance is not enough"
+        );
+        uint256 defaultPriceDropInterval = 60; // default value for price drop is 60 seconds
+        return
+            createAuction(
+                _startPrice,
+                _reservePrice,
+                _priceDropValue,
+                _initialSupply,
+                defaultPriceDropInterval
+            );
+    }
+
+    /**
+     * @dev Creates a new auction with specified parameters.
+     * The function sets various auction parameters and registers the auction.
+     * @param _startPrice The initial price of the auction.
+     * @param _reservePrice The minimum acceptable price for the auction.
+     * @param _priceDropValue The value each interval drop
+     * @param _initialSupply The amount of tokens available for auction.
+     * @param _priceDropInterval The time interval for price drop
+     * @return auctionID The ID of the created auction.
+     */
+    function createAuction(
+        uint256 _startPrice,
+        uint256 _reservePrice,
+        uint256 _priceDropValue,
+        uint256 _initialSupply,
+        uint256 _priceDropInterval
     ) public returns (uint256) {
         require(
             allowanceRequired[msg.sender] + _initialSupply <=
@@ -102,6 +136,7 @@ contract DutchAuction is ReentrancyGuard {
         reservePrice[auctionID] = _reservePrice;
         startPrice[auctionID] = _startPrice;
         totalCommitment[auctionID] = 0;
+        priceDropValue[auctionID] = _priceDropValue;
         priceDropInterval[auctionID] = _priceDropInterval;
         return auctionID;
     }
@@ -165,9 +200,10 @@ contract DutchAuction is ReentrancyGuard {
         uint256 _auctionID
     ) public view auctionNotEnded(_auctionID) returns (uint256) {
         uint256 elapsedTimes = block.timestamp - startTime[_auctionID];
-        uint256 elapsedTimes_in_minutes = elapsedTimes / 60;
-        uint256 priceDrop = elapsedTimes_in_minutes *
+        uint256 elapsedTimes_in_interval = elapsedTimes /
             priceDropInterval[_auctionID];
+        uint256 priceDrop = elapsedTimes_in_interval *
+            priceDropValue[_auctionID];
         return
             (startPrice[_auctionID] > reservePrice[_auctionID] + priceDrop)
                 ? startPrice[_auctionID] - priceDrop
