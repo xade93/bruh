@@ -69,16 +69,17 @@ const App: React.FC = () => {
     console.log(`Test Account DUT bal = ${ba} PCS`)
   });
 
-  // DUTWSigner.getMoney(Acc0Addr, 10000).then(
-  //   () => {
-  //     console.log("MONEY!!!!!!!")
-  //     DUTWSigner.approve(AuctionAddr, 400).then(
-  //       () => {
-  //         console.log("Approal of 400 wei")
-  //       }
-  //     )
-  //   }
-  // )
+  // Give test account some $$$ to test, this is not a bug lol
+  DUTWSigner.getMoney(Acc0Addr, 10000).then(
+    () => {
+      console.log("MONEY!!!!!!!")
+      DUTWSigner.approve(AuctionAddr, 400).then(
+        () => {
+          console.log("Approal of 400 wei")
+        }
+      )
+    }
+  )
 
   // one-time approval of 400 DUTs
 
