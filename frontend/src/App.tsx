@@ -4,6 +4,21 @@ import './App.css';
 import { AuctionForm } from './AuctionForm'; 
 import { BuyDialog } from './BuyDialog';
 import { TokenData, TokenContractData } from './DataTypes';
+import { 
+  TokenAddr, 
+  AuctionAddr, 
+  Acc0Addr, 
+  TokenABI, 
+  AuctionABI,
+  provider,
+  signer,
+  DUTContract,
+  AuctionContract,
+  DUTWSigner,
+  AuctionWSigner,
+  init
+} from './AuctionVars';
+
 
 const addMoney = (contractWSigner: ethers.Contract, Acc0Addr: string) => {
   contractWSigner.balanceOf(Acc0Addr).then((ba: ethers.BigNumber) => {
@@ -16,8 +31,8 @@ const addMoney = (contractWSigner: ethers.Contract, Acc0Addr: string) => {
 }
 
 let currTokens: TokenData[] = [
-  { name: 'MyToken', currentPrice: 1.82, remainingTime: "01:21" },
-  { name: 'DogeToken', currentPrice: 302.12, remainingTime: "02:36" },
+  // { name: 'MyToken', currentPrice: 1.82, remainingTime: "01:21", auctionId: 114},
+  // { name: 'DogeToken', currentPrice: 302.12, remainingTime: "02:36", auctionId: 514 },
 ];
 
 function formatUnixTimestampToMMSS(unixTimestamp: number): string {
@@ -38,22 +53,13 @@ function formatUnixTimestampToMMSS(unixTimestamp: number): string {
 
 
 const App: React.FC = () => {
-  const TokenAddr = "0x5fbdb2315678afecb367f032d93f642f64180aa3";
-  const AuctionAddr = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512";
-  const Acc0Addr = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266";
-  const TokenABI = require("/home/xade/cx4153/bruh/frontend/src/artifacts/contracts/Token.sol/DUT.json").abi;
-  const AuctionABI = require("/home/xade/cx4153/bruh/frontend/src/artifacts/contracts/Auction.sol/DutchAuction.json").abi
-  
+  init()
   const [showForm, setShowForm] = useState(false);
   const [buyDiag, setBuyDiag] = useState(false);
 
-  let provider = new ethers.providers.JsonRpcProvider("http://127.0.0.1:8545");
-  let signer = provider.getSigner(Acc0Addr)
-  let DUTContract = new ethers.Contract(TokenAddr, TokenABI, provider);
-  let AuctionContract = new ethers.Contract(AuctionAddr, AuctionABI, provider);
-  const DUTWSigner = DUTContract.connect(signer);
-  const AuctionWSigner = AuctionContract.connect(signer);
   let [tokens, setTokens] = useState<TokenData[]>(currTokens);
+  let [activeAuction, setActiveAuction] = useState(0);
+  let [unitPrice, setUnitPrice] = useState(0);
 
   // display balance
   provider.getBalance(Acc0Addr).then(bal => { // wei - 1e22 initially
@@ -63,14 +69,21 @@ const App: React.FC = () => {
     console.log(`Test Account DUT bal = ${ba} PCS`)
   });
 
-  // one-time approval of 400
-  // DUTWSigner.approve(AuctionAddr, 400).then(
+  // DUTWSigner.getMoney(Acc0Addr, 10000).then(
   //   () => {
-  //     console.log("Approal of 400 wei")
+  //     console.log("MONEY!!!!!!!")
+  //     DUTWSigner.approve(AuctionAddr, 400).then(
+  //       () => {
+  //         console.log("Approal of 400 wei")
+  //       }
+  //     )
   //   }
   // )
-  const addNewAuction = async (newTokenb: TokenContractData) => {
-    const newToken = {currentPrice: 13, reservePrice: 2, priceDropInterval: 1, initialSupply: 2};;
+
+  // one-time approval of 400 DUTs
+
+  const addNewAuction = async (newToken: TokenContractData) => {
+    // const newToken = {currentPrice: 13, reservePrice: 2, priceDropInterval: 1, initialSupply: 2};
     console.log("allowance successfully transferred");
     const tx = await AuctionWSigner.createAuction(newToken.currentPrice, newToken.reservePrice, newToken.priceDropInterval, newToken.initialSupply);
     const ret = await tx.wait();
@@ -95,18 +108,21 @@ const App: React.FC = () => {
       const sp = await AuctionWSigner.startPrice(i);
       const rp = await AuctionWSigner.reservePrice(i);
       const startTime = await AuctionWSigner.startTime(i);
-      let duration = "Not Started";
+      let duration = Date.now() / 1000 - startTime; // in seconds
       let currPrice = 0;
-      if (ret2 == 1) {
+      let duration_str = "Not Started";
+      if (ret2 == 1 && duration <= 10 * 60) {
+        console.log(`${Date.now() / 1000} and ${startTime} and Duration is: ${duration}`)
         currPrice = await AuctionWSigner.currentPrice(i);
-        console.log(`${Date.now()} and ${startTime} and ${40 * 60 - (Date.now() / 1000 - startTime)}`)
-        duration = formatUnixTimestampToMMSS(40 * 60 - (Date.now() / 1000 - startTime));
+        
+        duration_str = formatUnixTimestampToMMSS(20 * 60 - duration);
       }
       console.log(`${i}th auction has state ${ret2} and start price ${sp} reserve price ${rp} with currPrice ${currPrice} and startTime ${duration}`);
       let currObj: TokenData = {
-        name: "bruh",
+        name: "Auction " + i.toString(),
         currentPrice: currPrice,
-        remainingTime: duration,
+        remainingTime: duration_str,
+        auctionId: i,
       }
       ret.push(currObj)
     }
@@ -141,16 +157,15 @@ const App: React.FC = () => {
             <h2>{token.name}</h2>
             <p>Current Price: {token.currentPrice.toString()} wei</p>
             <p>Remaining Time: {token.remainingTime}</p>
-            <button className="buy-button" onClick={() => setBuyDiag(true)}>Buy</button>
+            <button className="buy-button" onClick={() => {
+              setBuyDiag(true)
+              setActiveAuction(token.auctionId)
+              setUnitPrice(token.currentPrice)
+            }}>Buy</button>
           </div>
         ))}
       </div>
-      {buyDiag && 
-        <BuyDialog // FIXME
-          token="1"
-          onBuy={(am)=>{}}
-          onCancel={()=>{}}
-        />}
+      {buyDiag && <BuyDialog auctionId={activeAuction} unitPrice={unitPrice}/>}
     </div>
   );
 };

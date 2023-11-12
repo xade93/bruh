@@ -1,49 +1,63 @@
-// BuyDialog.tsx
-
 import { CSSProperties, useState } from 'react';
+import { 
+  TokenAddr, 
+  AuctionAddr, 
+  Acc0Addr, 
+  TokenABI, 
+  AuctionABI,
+  provider,
+  signer,
+  DUTContract,
+  AuctionContract,
+  DUTWSigner,
+  AuctionWSigner,
+  init
+} from './AuctionVars';
+interface BuyDialogProps {
+  auctionId: number;
+  unitPrice: number;
+}
 
-type BuyDialogProps = {
-  token: string; // FIXME
-  onBuy: (amount: number) => void; 
-  onCancel: () => void;
-};
-
-export const BuyDialog = ({ token, onBuy, onCancel }: BuyDialogProps) => {
-
+export const BuyDialog: React.FC<BuyDialogProps> = ({auctionId, unitPrice}) => {
+  console.log(`sanity: ${auctionId} and  ${unitPrice}`)
   const [amount, setAmount] = useState(0);
 
-  const totalDeposit = amount * 123; // FIXME: token.currPrice
+  const totalDeposit = amount * unitPrice;
 
   const style: CSSProperties = {
-    backgroundColor: 'white',
+    backgroundColor: 'white', 
     padding: '20px',
-    borderRadius: '10px'   
+    borderRadius: '10px'
   };
-  // FIXME
+
+  const handleConfirm = () => {
+    AuctionWSigner.bid(auctionId, {value: totalDeposit}).then(() => {
+      console.log("Bid successfully");
+    })
+  }
+
   return (
     <dialog open style={style}>
-    
-      <h2>Buy TOKENNAME</h2> 
-
+      <h2>Buy Token</h2>
+      
       <p>
         <label>Amount:</label>
         <input 
           type="number"
           value={amount}
-          onChange={e => setAmount(Number(e.target.value))}
-        />  
+          onChange={e => setAmount(Number(e.target.value))} 
+        />
       </p>
 
       <p>
-        You need to deposit: {totalDeposit.toFixed(2)} 
+        You need to deposit (est.): {totalDeposit.toFixed(2)} wei
       </p>
 
       <div>
-        <button onClick={() => onBuy(amount)}>Confirm</button>
-        <button onClick={onCancel}>Cancel</button>  
+        <button onClick={handleConfirm}>Confirm</button>
+        <button>Cancel</button>
       </div>
 
     </dialog>
   );
-
-};
+}

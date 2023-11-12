@@ -41,6 +41,7 @@ export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
       reservePrice: reservePrice,
       priceDropInterval: priceDropInterval,
       initialSupply: tokensSupplied,
+      auctionId: -1 // does not matter
     }).then()
   };
 

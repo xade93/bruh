@@ -160,6 +160,11 @@ contract DutchAuction is ReentrancyGuard {
             _priceDropInterval,
             lastingTime
         );
+        
+        startTime[auctionID] = block.timestamp;
+        state[auctionID] = AuctionState.Running;
+        emit AuctionStarted(auctionID, startTime[auctionID]);
+
         return auctionID;
     }
 
@@ -518,4 +523,6 @@ contract DutchAuction is ReentrancyGuard {
         emit AuctionTokenBurn(_auctioneer, shouldBurnValue[_auctioneer]);
         shouldBurnValue[_auctioneer] = 0;
     }
+
+    
 }

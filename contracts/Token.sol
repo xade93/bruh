@@ -83,7 +83,7 @@ contract DUT is ERC20 {
      * @param value The amount of tokens to be locked and approved.
      * @return A boolean indicating whether the approval was successful.
      */
-    function approve(
+   function approve(
         address spender,
         uint256 value
     ) public override returns (bool) {
@@ -92,8 +92,9 @@ contract DUT is ERC20 {
             balanceOf(owner) - lockedBalanceOf(owner) >= value,
             "Unlocked balance is not enough to create approval"
         );
+        uint256 currentAllowance = allowance(owner, spender);
         _addLockedBalance(owner, value);
-        _approve(owner, spender, value);
+        _approve(owner, spender, value + currentAllowance);
         return true;
     }
 
