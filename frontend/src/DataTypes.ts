@@ -2,6 +2,7 @@ export type TokenData = {
     name: string;
     currentPrice: number;
     remainingTime: string;
+    remainingTokens: number;
     auctionId: number;
   };
   

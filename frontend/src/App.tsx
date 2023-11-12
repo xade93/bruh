@@ -111,10 +111,11 @@ const App: React.FC = () => {
       let duration = Date.now() / 1000 - startTime; // in seconds
       let currPrice = 0;
       let duration_str = "Not Started";
+      let remainingTokens = 0;
       if (ret2 == 1 && duration <= 10 * 60) {
         console.log(`${Date.now() / 1000} and ${startTime} and Duration is: ${duration}`)
         currPrice = await AuctionWSigner.currentPrice(i);
-        
+        remainingTokens = (await AuctionWSigner.remainMaximumToken(i)).toNumber();
         duration_str = formatUnixTimestampToMMSS(20 * 60 - duration);
       }
       console.log(`${i}th auction has state ${ret2} and start price ${sp} reserve price ${rp} with currPrice ${currPrice} and startTime ${duration}`);
@@ -123,6 +124,7 @@ const App: React.FC = () => {
         currentPrice: currPrice,
         remainingTime: duration_str,
         auctionId: i,
+        remainingTokens: remainingTokens,
       }
       ret.push(currObj)
     }
@@ -157,6 +159,7 @@ const App: React.FC = () => {
             <h2>{token.name}</h2>
             <p>Current Price: {token.currentPrice.toString()} wei</p>
             <p>Remaining Time: {token.remainingTime}</p>
+            <p>Remaining Tokens (est.): {token.remainingTokens}</p>
             <button className="buy-button" onClick={() => {
               setBuyDiag(true)
               setActiveAuction(token.auctionId)

@@ -524,5 +524,41 @@ contract DutchAuction is ReentrancyGuard {
         shouldBurnValue[_auctioneer] = 0;
     }
 
-    
+     /**
+     * @dev Calculates the remaining amount of tokens available in a specific auction.
+     * This function determines the number of tokens that are still available for purchase
+     * based on the auction's current state, current price, and total commitment.
+     *
+     * @param _auctionID The unique identifier of the auction in question.
+     *
+     * @return uint256 Returns the number of remaining tokens in the auction.
+     * If the auction is not in the 'Running' state, or if the current time has exceeded
+     * the auction's start time plus its duration, it returns 0.
+     * If the product of the current price and initial supply is less than or equal
+     * to the total commitment, it also returns 0. Otherwise, it returns the difference
+     * between the initial supply and the total commitment divided by the current price.
+     *
+     * Requirements:
+     * - The auction must be in a state that allows the calculation of remaining tokens.
+     * - The function only performs calculations and does not modify the state of the auction.
+     */
+
+    function remainMaximumToken(
+        uint256 _auctionID
+    ) public view returns (uint256) {
+        if (state[_auctionID] == AuctionState.Created) {
+            return initialSupply[_auctionID];
+        }
+        if (
+            state[_auctionID] != AuctionState.Running ||
+            block.timestamp > startTime[_auctionID] + lastingTime
+        ) {
+            return 0;
+        }
+        uint256 price = currentPrice(_auctionID);
+        if (price * initialSupply[_auctionID] <= totalCommitment[_auctionID]) {
+            return 0;
+        }
+        return initialSupply[_auctionID] - totalCommitment[_auctionID] / price;
+    }
 }
