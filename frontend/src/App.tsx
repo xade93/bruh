@@ -5,9 +5,8 @@ import { BuyDialog } from './BuyDialog';
 import { ethers } from 'ethers';
 import { Numbers } from 'web3';
 
-// TODO: update after deployment
-const contractABI = require("../artifacts/contracts/Auction.sol/DutchAuction.json").abi; 
-const contractAddress = "0xe7f1725e7734ce288f8367e1bb143e90bb3f0512";
+import dutchAuctionAddress from './dutchAuction-address.json';
+import dutchAuctionABI from './contracts/DutchAuction.json';
 
 type TokenData = {
   name: string;
@@ -44,7 +43,7 @@ const App: React.FC = () => {
 
   const provider = new ethers.providers.Web3Provider(window.ethereum);
   const signer = provider.getSigner();
-  const auctionContract = new ethers.Contract(contractAddress, contractABI, signer);
+  const auctionContract = new ethers.Contract(dutchAuctionAddress.address, dutchAuctionABI.abi, signer);
 
   const addNewAuction = async (newToken: TokenData) => {
     try {
