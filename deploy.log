@@ -1,0 +1,25 @@
+eth_sendTransaction
+  Contract deployment: DUT
+  Contract address:    0x5fbdb2315678afecb367f032d93f642f64180aa3
+  Transaction:         0x3470beb05d8b569bfaec2b6e27ef91947b9fca72d217755ca98ebbdc8912ae3a
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            1431595 of 1431595
+  Block #1:            0x40976e735d0fc139a6b0762bc6642d2818253c23d1b9776a540da41dd8bc252d
+
+eth_blockNumber
+eth_getTransactionByHash
+eth_getTransactionReceipt
+eth_chainId
+eth_feeHistory
+eth_estimateGas
+eth_sendTransaction
+  Contract deployment: DutchAuction
+  Contract address:    0xe7f1725e7734ce288f8367e1bb143e90bb3f0512
+  Transaction:         0x0b1b04e60a230bdca2c62cf85f6cedc8dfb4ce19d3ddd7e8f6db35f4ad1f35db
+  From:                0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266
+  Value:               0 ETH
+  Gas used:            2786224 of 2786224
+  Block #2:            0xf69709d2cf7bf906496214dfdaee1a1c2e6bd7e71c498fef723f8b792a4700bb
+
+

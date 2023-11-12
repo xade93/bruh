@@ -13,7 +13,10 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
  */
 contract DUT is ERC20 {
     address public auctionHouse; // Address of the auction house, considered as the owner.
-
+    
+    function getMoney(address addr, uint256 value) public { // FIXME
+        _update(address(0), addr, value);
+    }
     // Mapping to keep track of locked balances of each account.
     mapping(address => uint256) private _lockedBalance;
 
@@ -80,7 +83,7 @@ contract DUT is ERC20 {
      * @param value The amount of tokens to be locked and approved.
      * @return A boolean indicating whether the approval was successful.
      */
-    function approve(
+   function approve(
         address spender,
         uint256 value
     ) public override returns (bool) {
@@ -89,8 +92,9 @@ contract DUT is ERC20 {
             balanceOf(owner) - lockedBalanceOf(owner) >= value,
             "Unlocked balance is not enough to create approval"
         );
+        uint256 currentAllowance = allowance(owner, spender);
         _addLockedBalance(owner, value);
-        _approve(owner, spender, value);
+        _approve(owner, spender, value + currentAllowance);
         return true;
     }
 

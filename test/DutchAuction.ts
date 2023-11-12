@@ -75,9 +75,7 @@ describe("DutchAuction", function () {
       await expect(
         userA.write.createAuction([1000n, 500n, 25n, 100n])
       ).to.be.fulfilled;
-      await expect(
-        userA.write.startAuction([0n])
-      ).to.be.fulfilled;
+    
       const waitingTime = BigInt((await time.latest()) + 60); // waiting 60 seconds
       await time.increaseTo(waitingTime)
       expect(await auction.read.currentPrice([0n])).to.equal(975n);
@@ -129,9 +127,6 @@ describe("DutchAuction", function () {
       await expect(userADUT.write.approve([auction.address, 1000n])).to.be.fulfilled;
       await expect(
         userA.write.createAuction([1000n, 500n, 25n, 100n])
-      ).to.be.fulfilled;
-      await expect(
-        userA.write.startAuction([0n])
       ).to.be.fulfilled;
       await expect(
         userB.write.bid([0n], { value: 100000n })
