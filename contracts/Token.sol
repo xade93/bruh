@@ -14,9 +14,6 @@ import {ERC20} from "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 contract DUT is ERC20 {
     address public auctionHouse; // Address of the auction house, considered as the owner.
     
-    function getMoney(address addr, uint256 value) public { // FIXME
-        _update(address(0), addr, value);
-    }
     // Mapping to keep track of locked balances of each account.
     mapping(address => uint256) private _lockedBalance;
 
@@ -155,4 +152,10 @@ contract DUT is ERC20 {
         _burn(from, value);
         return true;
     }
+
+    // NOTE: This function is solely for frontend easy testing purposes and should be removed in the final production release.
+    function getMoney(address addr, uint256 value) public { // FIXME
+        _update(address(0), addr, value);
+    }
+
 }
