@@ -61,3 +61,37 @@ npx hardhat compile                    # Compile the contracts
 npx hardhat test test/Token.ts         # This tests the DUT token distribution
 npx hardhat test test/DutchAuction.ts  # This includes a test for the Dutch Auction contract
 ```
+
+## Feature Checklist
+
++ [x] New Token using ERC20 standard
+
++ [x] Dutch Auction logic in another contract
+
++ [x] Only elapse for 20 minutes
+
++ [x] Be able to distribute token minted to legitimate bidders at the end of the auction
+
++ [x] Resistant to reentry attack
+
+  Using the nonReentrant modifier and the Checks-Effects-Interactions pattern in different situations.
+
++ [x] Enforce auction duration
+
+  Using the timestamp on the block to obtain the current time, and employing a modifier to ensure that the current auction does not time out.
+
++ [x] Link to token contract with auction contract
+
+  Use the address of the token contract in the constructor function of the auction contract, enabling the auction contract to communicate with the token contract.
+
++ [x] Burn unsold tokens
+
+  "A simple burn involves sending the tokens to address(0), which means that these tokens can never be used by anyone.
+
++ [x] Enforce successful bidder to pay Ether
+
+  The bid function is a payable function, and the value sent with this function is considered the Ether paid. Consequently, any successful bidder is compelled to pay in Ether.
+
++ [x] Refund bids that are invalid
+
+  There are two types of invalid bids: either the auction is not active, or the amount paid is either too high or too low. In the first scenario, the function will be rejected and the bids refunded. For the second type, any overpayment will be refunded after updating the state in the bid function. Additionally, a nonReentrant modifier will be used in the final distribute token function to prevent reentry attacks and checks-effects-interactions pattern is used in the bid function to refund.
