@@ -38,7 +38,7 @@ contract DutchAuction is ReentrancyGuard {
         Canceled
     }
     mapping(uint256 => AuctionState) public state; // Mapping of auction IDs to their states
-    uint256[] auctions; // List of auctions
+    uint256[] public auctions; // List of auctions
 
     // Events for various actions within the contract
     event AuctionStarted(uint256 auctionID, uint startBlock);
@@ -46,6 +46,16 @@ contract DutchAuction is ReentrancyGuard {
     event AuctionEnded(uint256 auctionID);
     event AuctionResult(uint256 auctionID, address[] winner, uint[] amount);
     event AuctionTokenBurn(address auctioneer, uint256 amount);
+    event AuctionCreate(
+        uint256 auctionID,
+        address auctioneer,
+        uint256 initialSupply,
+        uint256 reservePrice,
+        uint256 startPrice,
+        uint256 priceDropValue,
+        uint256 priceDropInterval,
+        uint256 lastingTime
+    );
 
     /**
      * @dev Constructor that sets the token address.
@@ -83,7 +93,7 @@ contract DutchAuction is ReentrancyGuard {
      * @param _initialSupply The amount of tokens available for auction.
      * @return auctionID The ID of the created auction.
      */
-    function createAuction(
+   function createAuction(
         uint256 _startPrice,
         uint256 _reservePrice,
         uint256 _priceDropValue,
@@ -96,7 +106,8 @@ contract DutchAuction is ReentrancyGuard {
         );
         uint256 defaultPriceDropInterval = 60; // default value for price drop is 60 seconds
         return
-            createAuction(
+            _createAuction(
+                msg.sender,
                 _startPrice,
                 _reservePrice,
                 _priceDropValue,
@@ -115,7 +126,8 @@ contract DutchAuction is ReentrancyGuard {
      * @param _priceDropInterval The time interval for price drop (in seconds)
      * @return auctionID The ID of the created auction.
      */
-    function createAuction(
+     function _createAuction(
+        address _auctioneer,
         uint256 _startPrice,
         uint256 _reservePrice,
         uint256 _priceDropValue,
@@ -123,14 +135,14 @@ contract DutchAuction is ReentrancyGuard {
         uint256 _priceDropInterval
     ) public returns (uint256) {
         require(
-            allowanceRequired[msg.sender] + _initialSupply <=
-                token.allowance(msg.sender, address(this)),
+            allowanceRequired[_auctioneer] + _initialSupply <=
+                token.allowance(_auctioneer, address(this)),
             "allowance is not enough"
         );
-        allowanceRequired[msg.sender] += _initialSupply;
+        allowanceRequired[_auctioneer] += _initialSupply;
         uint256 auctionID = auctions.length;
         auctions.push(auctionID);
-        auctioneer[auctionID] = msg.sender;
+        auctioneer[auctionID] = _auctioneer;
         state[auctionID] = AuctionState.Created;
         initialSupply[auctionID] = _initialSupply;
         reservePrice[auctionID] = _reservePrice;
@@ -138,8 +150,23 @@ contract DutchAuction is ReentrancyGuard {
         totalCommitment[auctionID] = 0;
         priceDropValue[auctionID] = _priceDropValue;
         priceDropInterval[auctionID] = _priceDropInterval;
+        emit AuctionCreate(
+            auctionID,
+            _auctioneer,
+            _initialSupply,
+            _reservePrice,
+            _startPrice,
+            _priceDropValue,
+            _priceDropInterval,
+            lastingTime
+        );
         return auctionID;
     }
+
+    function auctionCount() public view returns (uint256) {
+        return auctions.length;
+    }
+
 
     /**
      * @dev Starts an auction with a given ID.

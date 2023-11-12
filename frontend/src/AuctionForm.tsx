@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { CSSProperties } from 'react';
+import { TokenData, TokenContractData } from './DataTypes';
+
 const formStyle: CSSProperties = {
     display: 'grid',
     gridTemplateColumns: '1fr 3fr', 
@@ -20,14 +22,8 @@ const formStyle: CSSProperties = {
     border: '1px solid #ccc'
   };
   
-type TokenData = {
-  name: string;
-  currentPrice: number;
-  remainingTime: number;
-};
-
 type AuctionFormProps = {
-  addNewAuction: (newToken: TokenData) => void;
+  addNewAuction: (newToken: TokenContractData) => Promise<void>;
 };
 
 export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
@@ -35,15 +31,17 @@ export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
   const [tokensSupplied, setTokensSupplied] = useState(0);
   const [startPrice, setStartPrice] = useState(0);
   const [reservePrice, setReservePrice] = useState(0);
-  const [priceDropInterval, setPriceDropInterval] = useState('');
+  const [priceDropInterval, setPriceDropInterval] = useState(0);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     addNewAuction({
-      name,
+      name: name,
       currentPrice: startPrice,
-      remainingTime: 60, // You can set a default remaining time or modify the form to accept this value
-    });
+      reservePrice: reservePrice,
+      priceDropInterval: priceDropInterval,
+      initialSupply: tokensSupplied,
+    }).then()
   };
 
   return (
@@ -88,15 +86,13 @@ export const AuctionForm: React.FC<AuctionFormProps> = ({ addNewAuction }) => {
         />
   
         <label style={labelStyle}>Price Drop Interval</label>
-        <select 
+        <input
           style={inputStyle}
+          type="number" 
           value={priceDropInterval}
-          onChange={(e) => setPriceDropInterval(e.target.value)}
-        >
-          <option value="0.1">0.1</option>
-          <option value="0.5">0.5</option>
-          <option value="1">1</option>
-        </select>
+          onChange={(e) => setPriceDropInterval(Number(e.target.value))} 
+          placeholder = "Price Drop Interval"
+        />
         
         <button type="submit">Confirm</button>
       </form>
