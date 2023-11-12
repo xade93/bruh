@@ -27,13 +27,27 @@ This will install all the dependencies listed under `dependencies` and `devDepen
 + `"@nomicfoundation/hardhat-toolbox-viem"`
 
 ## Quick Start
+Below commands were tested on Arch Linux Rolling Release (Nov 12 2023). 
+
+Install dependencies.
+```shell
+sudo pacman -S npm
+```
 
 Compile the contracts and deploy to local chain
 ```shell
 npx hardhat compile                                    # Compile the contracts
 npx hardhat node                                       # Connect to localhost Hardhar network
 npx hardhat run scripts/deploy.ts --network localhost  # Deploy contracts to local chain
+cp -r artifacts frontend/src/                          # Copy compiled contract ABIs into frontend (react.js forbids accessing file outside root scope)
 ```
+
+Capture the test account addresses & private keys, and paste them into frontend:
+![image](https://github.com/xade93/bruh/assets/24752033/f839f002-03e9-40a6-9757-6311e4be5259)
+
+![image](https://github.com/xade93/bruh/assets/24752033/ad9e4aa6-307e-4e25-a600-6f14393a9669)
+
+
 Run the frontend application
 ```shell
 cd frontend
