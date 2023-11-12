@@ -86,7 +86,7 @@ npx hardhat test test/DutchAuction.ts  # This includes a test for the Dutch Auct
 
 + [x] Burn unsold tokens
 
-  "A simple burn involves sending the tokens to address(0), which means that these tokens can never be used by anyone.
+  A simple burn involves sending the tokens to address(0), which means that these tokens can never be used by anyone.
 
 + [x] Enforce successful bidder to pay Ether
 
