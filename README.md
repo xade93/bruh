@@ -16,20 +16,35 @@ The project is developed using Node.js and Hardhat. Below are the stpes to insta
 
 ### Installation
 
-Install the dependencies using npm:
+Install the dependencies using npm under root directory:
 ```shell
 npm install
 ```
 
 This will install all the dependencies listed under `dependencies` and `devDependencies` in the `package.json` file. This includes:
-+ "@openzepplin/contracts"
-+ "hardhat"
-+ "@nomicfoundation/hardhat-toolbox-viem"
++ `"@openzepplin/contracts"`
++ `"hardhat"`
++ `"@nomicfoundation/hardhat-toolbox-viem"`
 
 ## Quick Start
 
+Compile the contracts and deploy to local chain
 ```shell
-npx hardhat compile # Compile the contracts
-npx hardhat test test/Token.ts # This tests the DUT token distribution
-npx hardhat test test/DutchAuction.ts # This includes a test for the Dutch Auction contract
+npx hardhat compile                                    # Compile the contracts
+npx hardhat node                                       # Connect to localhost Hardhar network
+npx hardhat run scripts/deploy.ts --network localhost  # Deploy contracts to local chain
+```
+Run the frontend application
+```shell
+cd frontend
+npm install  # Install frontend app dependencies
+npm start    # Start frontend on localhost portal
+```
+
+## Testing
+
+```shell
+npx hardhat compile                    # Compile the contracts
+npx hardhat test test/Token.ts         # This tests the DUT token distribution
+npx hardhat test test/DutchAuction.ts  # This includes a test for the Dutch Auction contract
 ```
